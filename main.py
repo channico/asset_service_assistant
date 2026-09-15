@@ -1,8 +1,9 @@
-"""Command-line entry point for lesson 1 of Asset Service Assistant."""
+"""Command-line entry point for Asset Service Assistant."""
 
 import argparse
 
-from asset_repository import Asset, find_asset, load_assets
+from asset_repository import Asset, load_assets
+from asset_tools import get_asset_details
 
 
 def print_asset(asset: Asset) -> None:
@@ -26,11 +27,11 @@ def main() -> None:
     assets = load_assets()
 
     if args.asset_id:
-        asset = find_asset(args.asset_id, assets)
-        if asset is None:
-            print(f"No asset found with ID '{args.asset_id}'.")
+        result = get_asset_details(args.asset_id)
+        if result["status"] == "not_found":
+            print(result["error"]["message"])
             return
-        print_asset(asset)
+        print_asset(Asset(**result["asset"]))
         return
 
     print(f"Loaded {len(assets)} synthetic assets:")

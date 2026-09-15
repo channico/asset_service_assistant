@@ -132,3 +132,18 @@ to exactly one asset. `service_repository.py` validates required identifiers,
 ISO-formatted dates, allowed status values, unique record IDs, and references
 to missing assets. The validation command currently checks 10 assets, 15
 maintenance events, and 10 service tickets.
+
+## Lesson 3: exact asset-details lookup
+
+ASA-4 adds `get_asset_details(asset_id)` in `asset_tools.py`. This is the
+deterministic interface that a later agent can call for an asset lookup:
+
+- A valid ID returns a `found` result containing the exact stored asset fields.
+- An unknown, partial, blank, or non-text ID returns a structured `not_found`
+  result instead of guessing a likely asset.
+- Matching ignores letter case and surrounding whitespace, but does not use
+  fuzzy or semantic similarity.
+
+The response is a plain dictionary so it can be serialized as JSON. Successful
+responses keep tool metadata outside the `asset` object; the object itself has
+only fields loaded from the synthetic asset record.
