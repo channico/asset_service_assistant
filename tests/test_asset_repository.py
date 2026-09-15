@@ -16,7 +16,8 @@ class AssetRepositoryTests(unittest.TestCase):
     def test_finds_an_asset_by_exact_id(self) -> None:
         asset = find_asset("veh-1001", load_assets())
 
-        self.assertIsNotNone(asset)
+        if asset is None:
+            self.fail("Expected VEH-1001 to resolve to an asset")
         self.assertEqual(asset.name, "North Service Van")
 
     def test_returns_none_for_an_unknown_id(self) -> None:
