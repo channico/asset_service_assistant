@@ -27,6 +27,9 @@ env/
 .env.*
 !.env.example
 
+# Generated, rebuildable embedding index
+data/manual_index.json
+
 # PyCharm and IntelliJ project files
 .idea/
 *.iml

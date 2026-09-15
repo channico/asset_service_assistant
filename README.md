@@ -196,3 +196,35 @@ search corpus.
 
 This increment performs no embedding or generative-model calls. It establishes
 the validated source records that the next increment will chunk and embed.
+
+## Lesson 7: persistent manual embedding index
+
+ASA-12 adds an explicit ingestion step that keeps embedding work separate from
+later manual queries. Install the project dependencies, copy `.env.example` to
+an ignored `.env`, and set `OPENAI_API_KEY` locally. Never commit or paste the
+key into source code.
+
+Build the generated index from the current manual corpus:
+
+```bash
+python -m pip install -e .
+python manual_index.py ingest
+```
+
+The command chunks each structured manual section, embeds all chunks in one
+batch with `text-embedding-3-small`, and writes `data/manual_index.json`. Each
+record retains the document title, section ID and title, version and status,
+manufacturer, applicable model, source filename, passage, and embedding.
+
+The index also stores its format version, embedding model, chunking settings,
+embedding dimensions, and SHA-256 fingerprints of every source manual. Verify
+that a generated index remains usable without making an API request:
+
+```bash
+python manual_index.py check
+```
+
+A missing index, changed manual corpus, different embedding model, different
+chunking configuration, or unsupported index format produces an actionable
+error asking for re-ingestion. The generated index is rebuildable data and is
+ignored by Git.
