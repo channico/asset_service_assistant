@@ -228,3 +228,22 @@ A missing index, changed manual corpus, different embedding model, different
 chunking configuration, or unsupported index format produces an actionable
 error asking for re-ingestion. The generated index is rebuildable data and is
 ignored by Git.
+
+## Lesson 8: asset-model-filtered manual search
+
+ASA-13 adds `search_manual(asset_id, question)` in `manual_tools.py`. The tool
+first resolves the exact stored asset, then filters the index to that asset's
+manufacturer and model before calculating any cosine similarities. A Ford
+Transit question therefore cannot retrieve guidance for a Toyota forklift,
+even if the wording is highly similar.
+
+Search results are ordered by descending similarity and retain inspectable
+evidence: document and section citations, source filename, passage text, and
+version metadata. Current guidance is labelled `CURRENT`; superseded passages
+are labelled `SUPERSEDED - DO NOT TREAT AS CURRENT GUIDANCE`. The retrieval
+stage does not yet impose a relevance threshold—abstention calibration belongs
+to the next learning increment.
+
+Unknown or malformed assets and blank or non-text questions return structured
+errors. The unit tests inject deterministic embeddings, so running the test
+suite does not make an API request.
