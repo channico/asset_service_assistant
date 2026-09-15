@@ -58,5 +58,45 @@
     "year": 2022,
     "location": "Airport Terminal 2 Baggage Handling Area",
     "status": "under_maintenance"
+  },
+  {
+    "asset_id": "VEH-1003",
+    "name": "Mobile Workshop Truck",
+    "asset_type": "workshop_truck",
+    "manufacturer": "Mercedes-Benz",
+    "model": "Atego 816",
+    "year": 2021,
+    "location": "Central Workshop",
+    "status": "active"
+  },
+  {
+    "asset_id": "EQP-2003",
+    "name": "Workshop Air Compressor",
+    "asset_type": "air_compressor",
+    "manufacturer": "Atlas Copco",
+    "model": "GA 15",
+    "year": 2020,
+    "location": "Central Workshop",
+    "status": "active"
+  },
+  {
+    "asset_id": "GSE-3003",
+    "name": "Terminal 3 Belt Loader",
+    "asset_type": "belt_loader",
+    "manufacturer": "TLD",
+    "model": "NBL-E",
+    "year": 2024,
+    "location": "Airport Terminal 3 Apron",
+    "status": "in_service"
+  },
+  {
+    "asset_id": "FAC-4001",
+    "name": "Operations Building Chiller",
+    "asset_type": "chiller",
+    "manufacturer": "Trane",
+    "model": "CGAM 060",
+    "year": 2019,
+    "location": "Operations Building Plant Room",
+    "status": "active"
   }
 ]

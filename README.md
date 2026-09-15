@@ -105,9 +105,30 @@ Run the tests with Python's built-in test runner:
 python -m unittest discover -s tests -v
 ```
 
+Validate all three linked datasets directly:
+
+```bash
+python validate_data.py
+```
+
 ### Try it yourself
 
-- Add one new asset to the JSON file and confirm that the list shows five.
+- Add one new asset to the JSON file and confirm that the list shows eleven.
 - Give two records the same `asset_id` and observe the validation error.
 - Restore unique IDs, then add a new valid status in both the data and
   `VALID_STATUSES`.
+
+## Lesson 2: linked service data
+
+ASA-3 adds two child record types to the asset data model:
+
+- A maintenance event records its `maintenance_id`, parent `asset_id`, service
+  date, maintenance type, reported symptom, action, repair outcome, and status.
+- A service ticket records its `ticket_id`, parent `asset_id`, opened and closed
+  dates, status, priority, symptom, and optional repair outcome.
+
+The `asset_id` values act like foreign keys: they connect each event or ticket
+to exactly one asset. `service_repository.py` validates required identifiers,
+ISO-formatted dates, allowed status values, unique record IDs, and references
+to missing assets. The validation command currently checks 10 assets, 15
+maintenance events, and 10 service tickets.

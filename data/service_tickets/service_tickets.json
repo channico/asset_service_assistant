@@ -1,0 +1,102 @@
+[
+  {
+    "ticket_id": "TKT-0001",
+    "asset_id": "VEH-1001",
+    "opened_date": "2026-06-10",
+    "closed_date": "2026-06-11",
+    "status": "resolved",
+    "priority": "medium",
+    "symptom": "Sliding door is difficult to close",
+    "repair_outcome": "Door track serviced and normal latching confirmed"
+  },
+  {
+    "ticket_id": "TKT-0002",
+    "asset_id": "EQP-2001",
+    "opened_date": "2026-07-02",
+    "closed_date": null,
+    "status": "in_progress",
+    "priority": "high",
+    "symptom": "Hydraulic lift is responding slowly",
+    "repair_outcome": null
+  },
+  {
+    "ticket_id": "TKT-0003",
+    "asset_id": "GSE-3001",
+    "opened_date": "2026-07-23",
+    "closed_date": "2026-07-24",
+    "status": "resolved",
+    "priority": "high",
+    "symptom": "Output cable insulation appears worn",
+    "repair_outcome": "Cable assembly replaced and insulation test passed"
+  },
+  {
+    "ticket_id": "TKT-0004",
+    "asset_id": "GSE-3002",
+    "opened_date": "2026-08-13",
+    "closed_date": null,
+    "status": "escalated",
+    "priority": "high",
+    "symptom": "Baggage tractor loses pulling power under load",
+    "repair_outcome": null
+  },
+  {
+    "ticket_id": "TKT-0005",
+    "asset_id": "FAC-4001",
+    "opened_date": "2026-09-03",
+    "closed_date": null,
+    "status": "in_progress",
+    "priority": "high",
+    "symptom": "Chiller reports intermittent high-pressure alarm",
+    "repair_outcome": null
+  },
+  {
+    "ticket_id": "TKT-0006",
+    "asset_id": "EQP-2003",
+    "opened_date": "2026-04-20",
+    "closed_date": "2026-04-21",
+    "status": "resolved",
+    "priority": "medium",
+    "symptom": "Air compressor cycles too frequently",
+    "repair_outcome": "Air-line leak repaired and normal pressure cycle restored"
+  },
+  {
+    "ticket_id": "TKT-0007",
+    "asset_id": "VEH-1002",
+    "opened_date": "2026-01-27",
+    "closed_date": "2026-01-28",
+    "status": "resolved",
+    "priority": "medium",
+    "symptom": "Battery warning light appears intermittently",
+    "repair_outcome": "Alternator belt replaced and charging voltage verified"
+  },
+  {
+    "ticket_id": "TKT-0008",
+    "asset_id": "EQP-2002",
+    "opened_date": "2026-02-18",
+    "closed_date": null,
+    "status": "escalated",
+    "priority": "critical",
+    "symptom": "Backup generator cranks but does not start",
+    "repair_outcome": null
+  },
+  {
+    "ticket_id": "TKT-0009",
+    "asset_id": "GSE-3003",
+    "opened_date": "2026-09-12",
+    "closed_date": null,
+    "status": "open",
+    "priority": "low",
+    "symptom": "Belt tracking inspection requested after operator observation",
+    "repair_outcome": null
+  },
+  {
+    "ticket_id": "TKT-0010",
+    "asset_id": "VEH-1003",
+    "opened_date": "2026-09-14",
+    "closed_date": null,
+    "status": "open",
+    "priority": "medium",
+    "symptom": "Workshop compartment light does not illuminate",
+    "repair_outcome": null
+  }
+]

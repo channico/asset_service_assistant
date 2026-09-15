@@ -1,0 +1,152 @@
+[
+  {
+    "maintenance_id": "MNT-0001",
+    "asset_id": "VEH-1001",
+    "service_date": "2026-01-12",
+    "maintenance_type": "scheduled_service",
+    "symptom": "Routine 40000 km service interval reached",
+    "action_taken": "Changed engine oil and filters and inspected brakes",
+    "repair_outcome": "Service completed with no additional faults found",
+    "status": "completed"
+  },
+  {
+    "maintenance_id": "MNT-0002",
+    "asset_id": "VEH-1002",
+    "service_date": "2026-01-28",
+    "maintenance_type": "corrective_repair",
+    "symptom": "Intermittent battery warning light",
+    "action_taken": "Tested charging circuit and replaced alternator belt",
+    "repair_outcome": "Charging voltage returned to manufacturer range",
+    "status": "completed"
+  },
+  {
+    "maintenance_id": "MNT-0003",
+    "asset_id": "EQP-2001",
+    "service_date": "2026-02-05",
+    "maintenance_type": "scheduled_inspection",
+    "symptom": "Routine 500-hour inspection due",
+    "action_taken": "Inspected forks chains tyres and hydraulic hoses",
+    "repair_outcome": "Inspection passed and worn fork pin scheduled for monitoring",
+    "status": "follow_up_required"
+  },
+  {
+    "maintenance_id": "MNT-0004",
+    "asset_id": "EQP-2002",
+    "service_date": "2026-02-19",
+    "maintenance_type": "corrective_repair",
+    "symptom": "Generator cranked but did not start",
+    "action_taken": "Replaced fuel filter and bled fuel system",
+    "repair_outcome": "Generator started but load-bank retest remains required",
+    "status": "follow_up_required"
+  },
+  {
+    "maintenance_id": "MNT-0005",
+    "asset_id": "GSE-3001",
+    "service_date": "2026-03-02",
+    "maintenance_type": "preventive_maintenance",
+    "symptom": "Quarterly preventive maintenance due",
+    "action_taken": "Cleaned cooling system and tested output voltage",
+    "repair_outcome": "Unit passed operational checks",
+    "status": "completed"
+  },
+  {
+    "maintenance_id": "MNT-0006",
+    "asset_id": "GSE-3002",
+    "service_date": "2026-03-18",
+    "maintenance_type": "corrective_repair",
+    "symptom": "Reduced pulling power under load",
+    "action_taken": "Inspected drive system and replaced worn contactor",
+    "repair_outcome": "Pulling power improved but extended load test is pending",
+    "status": "follow_up_required"
+  },
+  {
+    "maintenance_id": "MNT-0007",
+    "asset_id": "VEH-1003",
+    "service_date": "2026-04-09",
+    "maintenance_type": "scheduled_service",
+    "symptom": "Annual service due",
+    "action_taken": "Changed fluids filters and inspected workshop equipment mounts",
+    "repair_outcome": "Vehicle returned to scheduled service",
+    "status": "completed"
+  },
+  {
+    "maintenance_id": "MNT-0008",
+    "asset_id": "EQP-2003",
+    "service_date": "2026-04-21",
+    "maintenance_type": "corrective_repair",
+    "symptom": "Compressor cycling more frequently than normal",
+    "action_taken": "Located and repaired an air-line leak",
+    "repair_outcome": "Normal pressure cycle restored",
+    "status": "completed"
+  },
+  {
+    "maintenance_id": "MNT-0009",
+    "asset_id": "GSE-3003",
+    "service_date": "2026-05-06",
+    "maintenance_type": "commissioning_inspection",
+    "symptom": "Initial operating inspection due",
+    "action_taken": "Checked belt tracking emergency stops and fluid levels",
+    "repair_outcome": "Inspection passed with no defects recorded",
+    "status": "completed"
+  },
+  {
+    "maintenance_id": "MNT-0010",
+    "asset_id": "FAC-4001",
+    "service_date": "2026-05-20",
+    "maintenance_type": "preventive_maintenance",
+    "symptom": "Quarterly chiller service due",
+    "action_taken": "Cleaned condenser coils and checked refrigerant indicators",
+    "repair_outcome": "Cooling performance remained within recorded baseline",
+    "status": "completed"
+  },
+  {
+    "maintenance_id": "MNT-0011",
+    "asset_id": "VEH-1001",
+    "service_date": "2026-06-11",
+    "maintenance_type": "corrective_repair",
+    "symptom": "Sliding door difficult to close",
+    "action_taken": "Cleaned and lubricated door track and adjusted roller",
+    "repair_outcome": "Door opened and latched normally",
+    "status": "completed"
+  },
+  {
+    "maintenance_id": "MNT-0012",
+    "asset_id": "EQP-2001",
+    "service_date": "2026-07-03",
+    "maintenance_type": "corrective_repair",
+    "symptom": "Hydraulic lift response slower than recorded baseline",
+    "action_taken": "Replaced hydraulic return filter and inspected fluid",
+    "repair_outcome": "Lift response improved; follow-up fluid sample requested",
+    "status": "follow_up_required"
+  },
+  {
+    "maintenance_id": "MNT-0013",
+    "asset_id": "GSE-3001",
+    "service_date": "2026-07-24",
+    "maintenance_type": "corrective_repair",
+    "symptom": "Output cable insulation showed surface wear",
+    "action_taken": "Replaced output cable assembly and performed insulation test",
+    "repair_outcome": "Cable test passed and unit returned to service",
+    "status": "completed"
+  },
+  {
+    "maintenance_id": "MNT-0014",
+    "asset_id": "GSE-3002",
+    "service_date": "2026-08-14",
+    "maintenance_type": "follow_up_inspection",
+    "symptom": "Extended load test pending after contactor replacement",
+    "action_taken": "Performed drive load test and inspected motor temperature",
+    "repair_outcome": "Motor temperature exceeded comparison unit and diagnosis remains open",
+    "status": "follow_up_required"
+  },
+  {
+    "maintenance_id": "MNT-0015",
+    "asset_id": "FAC-4001",
+    "service_date": "2026-09-04",
+    "maintenance_type": "corrective_repair",
+    "symptom": "Intermittent high-pressure alarm recorded",
+    "action_taken": "Cleaned airflow obstruction and checked fan operation",
+    "repair_outcome": "Alarm did not recur during observation; monitoring required",
+    "status": "follow_up_required"
+  }
+]
