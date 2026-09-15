@@ -38,5 +38,25 @@
     "year": 2019,
     "location": "West Service Centre",
     "status": "out_of_service"
+  },
+  {
+    "asset_id": "GSE-3001",
+    "name": "Terminal 1 Ground Power Unit",
+    "asset_type": "ground_power_unit",
+    "manufacturer": "TLD",
+    "model": "GPU-409-E",
+    "year": 2023,
+    "location": "Airport Terminal 1 Apron",
+    "status": "active"
+  },
+  {
+    "asset_id": "GSE-3002",
+    "name": "Terminal 2 Baggage Tractor",
+    "asset_type": "baggage_tractor",
+    "manufacturer": "Charlatte",
+    "model": "T135",
+    "year": 2022,
+    "location": "Airport Terminal 2 Baggage Handling Area",
+    "status": "under_maintenance"
   }
 ]

@@ -9,7 +9,7 @@ from typing import Any
 
 
 DEFAULT_ASSET_FILE = Path(__file__).parent / "data" / "assets" / "assets.json"
-VALID_STATUSES = {"active", "in_service", "out_of_service"}
+VALID_STATUSES = {"active", "in_service", "out_of_service", "under_maintenance"}
 
 
 @dataclass(frozen=True)
