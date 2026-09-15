@@ -1,0 +1,20 @@
+{
+  "manual_id": "MAN-FORD-TRANSIT-V1",
+  "title": "Transit Service Van Maintenance Guide",
+  "manufacturer": "Ford",
+  "applicable_model": "Transit",
+  "version": "1.0",
+  "version_status": "superseded",
+  "sections": [
+    {
+      "section_id": "SV-DOOR-01",
+      "title": "Sliding door visual check",
+      "text": "With the vehicle secured and switched off, inspect the sliding-door track for visible debris or damage. Record any resistance or abnormal noise and refer the vehicle to a qualified technician; do not force the door or adjust its mechanism during the service-desk check."
+    },
+    {
+      "section_id": "SV-TYRE-01",
+      "title": "Tyre condition check",
+      "text": "Check each tyre for visible cuts, bulges, embedded objects, or obvious loss of pressure. Record the observation and arrange inspection by a qualified technician when damage or pressure loss is suspected."
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "manual_id": "MAN-TLD-GPU-409-E-V1",
+  "title": "GPU-409-E Ground Power Unit Inspection Guide",
+  "manufacturer": "TLD",
+  "applicable_model": "GPU-409-E",
+  "version": "1.0",
+  "version_status": "current",
+  "sections": [
+    {
+      "section_id": "GPU-CABLE-01",
+      "title": "Output cable visual inspection",
+      "text": "With the ground power unit isolated under the approved site procedure, visually inspect the output cable and connector for cuts, exposed conductors, heat damage, or contamination. Do not connect or energize the unit when damage is observed; secure the area and contact a qualified technician."
+    },
+    {
+      "section_id": "GPU-PANEL-01",
+      "title": "Panel indicator check",
+      "text": "Before dispatch, record the displayed panel indicators without opening the enclosure or bypassing an alarm. If a warning or fault indicator is present, keep the unit out of service and refer the recorded state to a qualified technician."
+    }
+  ]
+}

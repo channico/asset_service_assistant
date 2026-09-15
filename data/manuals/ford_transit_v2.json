@@ -1,0 +1,25 @@
+{
+  "manual_id": "MAN-FORD-TRANSIT-V2",
+  "title": "Transit Service Van Maintenance Guide",
+  "manufacturer": "Ford",
+  "applicable_model": "Transit",
+  "version": "2.0",
+  "version_status": "current",
+  "sections": [
+    {
+      "section_id": "SV-DOOR-02",
+      "title": "Sliding door inspection",
+      "text": "Secure the vehicle, switch it off, and visually inspect the sliding-door upper and lower tracks for debris, obstruction, or damage. Do not force the door or adjust the latch. Record resistance, abnormal noise, or incomplete latching and escalate the vehicle to a qualified technician."
+    },
+    {
+      "section_id": "SV-BATTERY-01",
+      "title": "Battery warning indicator",
+      "text": "If the battery warning indicator remains illuminated after startup, record the indicator state and stop the service-desk check. Do not disconnect the battery or continue diagnosing the charging system; refer the vehicle to a qualified technician."
+    },
+    {
+      "section_id": "SV-TYRE-02",
+      "title": "Tyre condition and pressure evidence",
+      "text": "Inspect tyres for visible cuts, bulges, embedded objects, or obvious pressure loss. Record the affected wheel position and any available approved pressure reading, but do not declare the vehicle safe to operate; a qualified technician must assess abnormal findings."
+    }
+  ]
+}

@@ -105,7 +105,7 @@ Run the tests with Python's built-in test runner:
 python -m unittest discover -s tests -v
 ```
 
-Validate all three linked datasets directly:
+Validate all four datasets directly:
 
 ```bash
 python validate_data.py
@@ -176,3 +176,23 @@ Each related incident is labeled `related_incident` and includes the asset
 model, matching symptom tags, and close date as evidence. The response also
 states that historical incidents do not prove the cause of a current symptom;
 the tool is a retrieval aid, not a diagnostic system.
+
+## Lesson 6: versioned maintenance-manual corpus
+
+ASA-11 adds four short synthetic manuals under `data/manuals/` and validates
+them through `manual_repository.py`. Each manual records a stable ID, title,
+manufacturer, applicable asset model, version, version status, and structured
+sections. Section IDs are unique within their manual, and every section has a
+title and non-empty passage text.
+
+The corpus deliberately contains both current and superseded versions of the
+Ford Transit guide. Version status is explicit metadata rather than something
+later retrieval code must infer from a filename or publication order.
+
+`validate_manual_applicability()` also checks that every manual's manufacturer
+and model pair exists in the synthetic asset data. Not every asset needs a
+manual in this small POC, but an orphaned manual cannot silently enter the
+search corpus.
+
+This increment performs no embedding or generative-model calls. It establishes
+the validated source records that the next increment will chunk and embed.

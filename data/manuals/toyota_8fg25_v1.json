@@ -1,0 +1,20 @@
+{
+  "manual_id": "MAN-TOYOTA-8FG25-V1",
+  "title": "8FG25 Forklift Pre-Service Inspection Guide",
+  "manufacturer": "Toyota",
+  "applicable_model": "8FG25",
+  "version": "1.0",
+  "version_status": "current",
+  "sections": [
+    {
+      "section_id": "FLT-FORK-01",
+      "title": "Fork and carriage visual check",
+      "text": "Park and secure the forklift according to the approved site procedure. Visually inspect the forks and carriage for cracks, bending, missing retainers, or other visible damage. Do not use the forklift when damage is suspected; label the observation and contact a qualified technician."
+    },
+    {
+      "section_id": "FLT-LEAK-01",
+      "title": "Visible fluid leak response",
+      "text": "If fluid is visible beneath or around the forklift, keep people clear and follow the site spill and isolation procedure. Do not touch the fluid or operate the forklift. Record the location and appearance from a safe distance and notify the appropriate emergency process and a qualified technician."
+    }
+  ]
+}
