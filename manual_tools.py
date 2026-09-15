@@ -18,6 +18,9 @@ from manual_index import (
     load_manual_index,
 )
 
+DEFAULT_MIN_SIMILARITY = 0.40
+DEFAULT_TOP_K = 3
+
 
 def _empty_response(
     status: str,
@@ -91,12 +94,13 @@ def search_manual(
     index_path: Path = DEFAULT_INDEX_PATH,
     manual_directory: Path = DEFAULT_MANUAL_DIRECTORY,
     embedding_model: str = DEFAULT_EMBEDDING_MODEL,
+    top_k: int = DEFAULT_TOP_K,
 ) -> dict[str, Any]:
-    """Return ranked manual passages applicable to one exact stored asset.
+    """Return relevant ranked passages applicable to one exact stored asset.
 
     Manufacturer and model filtering happens before the question is embedded
-    and before any similarity is calculated. The function deliberately does
-    not apply an abstention threshold; calibration belongs to the next lesson.
+    and before any similarity is calculated. Every applicable candidate is
+    scored and sorted before the frozen threshold and ``top_k`` are applied.
     """
     asset_result = get_asset_details(asset_id)
     if asset_result["status"] == "not_found":
@@ -112,6 +116,13 @@ def search_manual(
             "invalid_request",
             "invalid_question",
             "Question must be non-empty text.",
+            asset,
+        )
+    if isinstance(top_k, bool) or not isinstance(top_k, int) or top_k < 1:
+        return _empty_response(
+            "invalid_request",
+            "invalid_top_k",
+            "top_k must be a positive integer.",
             asset,
         )
 
@@ -139,7 +150,7 @@ def search_manual(
     ]
     if not candidates:
         return {
-            "status": "found",
+            "status": "abstained",
             "asset": asset,
             "results": [],
             "returned_count": 0,
@@ -164,11 +175,11 @@ def search_manual(
             asset,
         )
 
-    results = []
+    scored_results = []
     for chunk in candidates:
         metadata = chunk["metadata"]
         is_current = metadata["version_status"] == "current"
-        results.append(
+        scored_results.append(
             {
                 "document": {
                     "manual_id": metadata["manual_id"],
@@ -197,7 +208,7 @@ def search_manual(
             }
         )
 
-    results.sort(
+    scored_results.sort(
         key=lambda result: (
             -result["similarity"],
             result["document"]["manual_id"].casefold(),
@@ -205,6 +216,26 @@ def search_manual(
             result["passage"].casefold(),
         )
     )
+    results = [
+        result
+        for result in scored_results
+        if result["similarity"] >= DEFAULT_MIN_SIMILARITY
+    ][:top_k]
+    if not results:
+        return {
+            "status": "abstained",
+            "asset": asset,
+            "results": [],
+            "returned_count": 0,
+            "candidate_count": len(candidates),
+            "explanation": (
+                "No applicable manual passage met the calibrated similarity "
+                f"threshold of {DEFAULT_MIN_SIMILARITY:.2f}. No citation can be "
+                "provided; escalate to the manual owner or a qualified technician."
+            ),
+            "error": None,
+        }
+
     return {
         "status": "found",
         "asset": asset,

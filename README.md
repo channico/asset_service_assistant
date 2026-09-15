@@ -241,9 +241,45 @@ Search results are ordered by descending similarity and retain inspectable
 evidence: document and section citations, source filename, passage text, and
 version metadata. Current guidance is labelled `CURRENT`; superseded passages
 are labelled `SUPERSEDED - DO NOT TREAT AS CURRENT GUIDANCE`. The retrieval
-stage does not yet impose a relevance threshold—abstention calibration belongs
-to the next learning increment.
+stage introduced here did not yet impose a relevance threshold; Lesson 9 adds
+the calibrated abstention behavior.
 
 Unknown or malformed assets and blank or non-text questions return structured
 errors. The unit tests inject deterministic embeddings, so running the test
 suite does not make an API request.
+
+## Lesson 9: calibrated manual-search abstention
+
+ASA-14 adds a frozen cosine-similarity threshold of `0.40` and a default
+`top_k` of three. Search still filters by the asset's exact manufacturer and
+model first. It then scores and deterministically sorts every applicable
+candidate before applying the threshold and result limit.
+
+When no passage reaches the threshold, `search_manual()` returns
+`status: "abstained"`, an empty `results` list, and an explanation that no
+citation can be provided. Unsupported and wrong-model questions therefore do
+not receive a low-confidence passage disguised as evidence.
+
+The ingestion and search workflow is:
+
+```bash
+python manual_index.py ingest
+python manual_index.py check
+python evaluate_manual_search.py
+```
+
+Ingestion embeds the current versioned manual corpus and persists section-level
+citations and applicability metadata in the generated index. Search embeds the
+question, restricts candidates to the exact asset model, and returns passage,
+document, section, source-file, similarity, and version evidence. Current and
+superseded passages remain clearly labelled; a superseded citation must never
+be presented as current guidance.
+
+The calibration fixtures are in `evaluation/manual_search_cases.json`, and the
+recorded scores and held-out results are in
+`evaluation/manual_search_results.md`. The threshold was selected only from
+the calibration cases and frozen before the held-out cases ran. The evaluation
+tests retrieval evidence—not generative answer quality—and is POC evidence,
+not production or safety validation. Recalibrate with a new frozen evaluation
+when the embedding model, chunking, corpus, or representative question set
+changes.

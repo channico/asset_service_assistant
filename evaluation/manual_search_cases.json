@@ -1,0 +1,133 @@
+{
+  "embedding_model": "text-embedding-3-small",
+  "frozen_threshold": 0.4,
+  "top_k": 3,
+  "cases": [
+    {
+      "id": "cal-relevant-door",
+      "phase": "calibration",
+      "category": "relevant",
+      "asset_id": "VEH-1001",
+      "question": "What should I record if the sliding door has resistance, abnormal noise, or incomplete latching?",
+      "expected_status": "found",
+      "expected_section_id": "SV-DOOR-02"
+    },
+    {
+      "id": "cal-paraphrased-battery",
+      "phase": "calibration",
+      "category": "paraphrased",
+      "asset_id": "VEH-1001",
+      "question": "The charging warning lamp stays lit after the van starts. What should the desk record?",
+      "expected_status": "found",
+      "expected_section_id": "SV-BATTERY-01"
+    },
+    {
+      "id": "cal-relevant-tyre",
+      "phase": "calibration",
+      "category": "relevant",
+      "asset_id": "VEH-1001",
+      "question": "What visible tyre damage should I look for?",
+      "expected_status": "found",
+      "expected_section_id": "SV-TYRE-01"
+    },
+    {
+      "id": "cal-relevant-cable",
+      "phase": "calibration",
+      "category": "relevant",
+      "asset_id": "GSE-3001",
+      "question": "How do I visually inspect the output lead and connector?",
+      "expected_status": "found",
+      "expected_section_id": "GPU-CABLE-01"
+    },
+    {
+      "id": "cal-paraphrased-leak",
+      "phase": "calibration",
+      "category": "paraphrased",
+      "asset_id": "EQP-2001",
+      "question": "There is liquid underneath the forklift. What is the safe response?",
+      "expected_status": "found",
+      "expected_section_id": "FLT-LEAK-01"
+    },
+    {
+      "id": "cal-borderline-routine",
+      "phase": "calibration",
+      "category": "borderline",
+      "asset_id": "VEH-1001",
+      "question": "What should be recorded during a routine inspection?",
+      "expected_status": "abstained",
+      "expected_section_id": null
+    },
+    {
+      "id": "cal-wrong-model",
+      "phase": "calibration",
+      "category": "wrong-model",
+      "asset_id": "VEH-1001",
+      "question": "How do I inspect forklift forks and carriage for bending?",
+      "expected_status": "abstained",
+      "expected_section_id": null
+    },
+    {
+      "id": "cal-unsupported-oil",
+      "phase": "calibration",
+      "category": "unsupported",
+      "asset_id": "VEH-1001",
+      "question": "Which engine oil viscosity should I use?",
+      "expected_status": "abstained",
+      "expected_section_id": null
+    },
+    {
+      "id": "cal-unsupported-radio",
+      "phase": "calibration",
+      "category": "unsupported",
+      "asset_id": "VEH-1001",
+      "question": "How do I reset the radio clock?",
+      "expected_status": "abstained",
+      "expected_section_id": null
+    },
+    {
+      "id": "held-paraphrased-door",
+      "phase": "held_out",
+      "category": "paraphrased",
+      "asset_id": "VEH-1001",
+      "question": "The side door does not close completely and makes an unusual sound. What evidence should I capture?",
+      "expected_status": "found",
+      "expected_section_id": "SV-DOOR-01"
+    },
+    {
+      "id": "held-paraphrased-panel",
+      "phase": "held_out",
+      "category": "paraphrased",
+      "asset_id": "GSE-3001",
+      "question": "A fault light appears on the unit display before dispatch. What do I do?",
+      "expected_status": "found",
+      "expected_section_id": "GPU-PANEL-01"
+    },
+    {
+      "id": "held-relevant-fork",
+      "phase": "held_out",
+      "category": "relevant",
+      "asset_id": "EQP-2001",
+      "question": "What visible damage on the lifting tines means the truck should not be used?",
+      "expected_status": "found",
+      "expected_section_id": "FLT-FORK-01"
+    },
+    {
+      "id": "held-wrong-model",
+      "phase": "held_out",
+      "category": "wrong-model",
+      "asset_id": "EQP-2001",
+      "question": "What should I do when the battery warning lamp stays on after starting the van?",
+      "expected_status": "abstained",
+      "expected_section_id": null
+    },
+    {
+      "id": "held-unsupported-coolant",
+      "phase": "held_out",
+      "category": "unsupported",
+      "asset_id": "VEH-1001",
+      "question": "What coolant type and quantity should be added?",
+      "expected_status": "abstained",
+      "expected_section_id": null
+    }
+  ]
+}
