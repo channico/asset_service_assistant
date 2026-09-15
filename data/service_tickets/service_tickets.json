@@ -7,6 +7,7 @@
     "status": "resolved",
     "priority": "medium",
     "symptom": "Sliding door is difficult to close",
+    "symptom_tags": ["sliding", "door", "close", "latching"],
     "repair_outcome": "Door track serviced and normal latching confirmed"
   },
   {
@@ -17,6 +18,7 @@
     "status": "in_progress",
     "priority": "high",
     "symptom": "Hydraulic lift is responding slowly",
+    "symptom_tags": ["hydraulic", "lift", "slow"],
     "repair_outcome": null
   },
   {
@@ -27,6 +29,7 @@
     "status": "resolved",
     "priority": "high",
     "symptom": "Output cable insulation appears worn",
+    "symptom_tags": ["output", "cable", "insulation", "worn"],
     "repair_outcome": "Cable assembly replaced and insulation test passed"
   },
   {
@@ -37,6 +40,7 @@
     "status": "escalated",
     "priority": "high",
     "symptom": "Baggage tractor loses pulling power under load",
+    "symptom_tags": ["pulling", "power", "load"],
     "repair_outcome": null
   },
   {
@@ -47,6 +51,7 @@
     "status": "in_progress",
     "priority": "high",
     "symptom": "Chiller reports intermittent high-pressure alarm",
+    "symptom_tags": ["chiller", "pressure", "alarm", "intermittent"],
     "repair_outcome": null
   },
   {
@@ -57,6 +62,7 @@
     "status": "resolved",
     "priority": "medium",
     "symptom": "Air compressor cycles too frequently",
+    "symptom_tags": ["air", "compressor", "cycles", "frequently"],
     "repair_outcome": "Air-line leak repaired and normal pressure cycle restored"
   },
   {
@@ -67,6 +73,7 @@
     "status": "resolved",
     "priority": "medium",
     "symptom": "Battery warning light appears intermittently",
+    "symptom_tags": ["battery", "warning", "light", "intermittently"],
     "repair_outcome": "Alternator belt replaced and charging voltage verified"
   },
   {
@@ -77,6 +84,7 @@
     "status": "escalated",
     "priority": "critical",
     "symptom": "Backup generator cranks but does not start",
+    "symptom_tags": ["generator", "cranks", "start"],
     "repair_outcome": null
   },
   {
@@ -87,6 +95,7 @@
     "status": "open",
     "priority": "low",
     "symptom": "Belt tracking inspection requested after operator observation",
+    "symptom_tags": ["belt", "tracking", "inspection"],
     "repair_outcome": null
   },
   {
@@ -97,6 +106,7 @@
     "status": "open",
     "priority": "medium",
     "symptom": "Workshop compartment light does not illuminate",
+    "symptom_tags": ["compartment", "light", "illuminate"],
     "repair_outcome": null
   }
 ]

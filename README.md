@@ -161,3 +161,18 @@ retrieving all recorded maintenance events for one exact asset ID:
 
 Like the asset-details lookup, this tool is deterministic, read-only, and
 returns plain dictionaries suitable for later use by an agent.
+
+## Lesson 5: ticket lookup and related incidents
+
+ASA-6 adds two deterministic service-ticket tools in `asset_tools.py`:
+
+- `get_ticket(ticket_id)` retrieves one exact ticket and labels the result as
+  an `exact_ticket`; unknown, malformed, and near-match IDs are not guessed.
+- `find_similar_incidents(asset_id, symptom)` considers only resolved tickets
+  with a close date for the same stored asset model. It compares normalized
+  words in the supplied symptom with the tickets' stored `symptom_tags`.
+
+Each related incident is labeled `related_incident` and includes the asset
+model, matching symptom tags, and close date as evidence. The response also
+states that historical incidents do not prove the cause of a current symptom;
+the tool is a retrieval aid, not a diagnostic system.

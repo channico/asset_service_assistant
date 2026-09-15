@@ -50,6 +50,17 @@ class ServiceRepositoryTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "ticket_id.*non-empty string"):
                 load_service_tickets(path)
 
+    def test_rejects_invalid_symptom_tags(self) -> None:
+        records = json.loads(DEFAULT_TICKET_FILE.read_text(encoding="utf-8"))
+        records[0]["symptom_tags"] = ["door", "DOOR"]
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "service_tickets.json"
+            path.write_text(json.dumps(records), encoding="utf-8")
+
+            with self.assertRaisesRegex(ValueError, "symptom tags must be unique"):
+                load_service_tickets(path)
+
     def test_rejects_reference_to_unknown_asset(self) -> None:
         assets = load_assets()
         events = load_maintenance_events()

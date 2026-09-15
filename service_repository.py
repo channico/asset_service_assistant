@@ -98,6 +98,7 @@ class ServiceTicket:
     status: str
     priority: str
     symptom: str
+    symptom_tags: list[str]
     repair_outcome: str | None
 
     @classmethod
@@ -130,6 +131,21 @@ class ServiceTicket:
                 "Service ticket field 'repair_outcome' must be a non-empty string or null"
             )
 
+        symptom_tags = record.get("symptom_tags")
+        if not isinstance(symptom_tags, list) or not symptom_tags:
+            raise ValueError(
+                "Service ticket field 'symptom_tags' must be a non-empty list"
+            )
+        if any(
+            not isinstance(tag, str) or not tag.strip() for tag in symptom_tags
+        ):
+            raise ValueError(
+                "Every service ticket symptom tag must be a non-empty string"
+            )
+        normalized_tags = [tag.strip().lower() for tag in symptom_tags]
+        if len(normalized_tags) != len(set(normalized_tags)):
+            raise ValueError("Service ticket symptom tags must be unique")
+
         if record["status"] not in VALID_TICKET_STATUSES:
             raise ValueError(f"Unknown ticket status '{record['status']}'")
         if record["priority"] not in VALID_PRIORITIES:
@@ -143,6 +159,7 @@ class ServiceTicket:
             status=record["status"],
             priority=record["priority"],
             symptom=record["symptom"],
+            symptom_tags=normalized_tags,
             repair_outcome=repair_outcome,
         )
 
