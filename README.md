@@ -85,6 +85,7 @@ next step. It must not invent measurements, records, citations, or conclusions.
 python main.py
 python main.py VEH-1001
 python main.py VEH-9999
+python assistant_agent.py "Show asset VEH-1001 and its maintenance history"
 ```
 
 ## Lesson 1: synthetic asset data
@@ -283,3 +284,29 @@ tests retrieval evidence—not generative answer quality—and is POC evidence,
 not production or safety validation. Recalibrate with a new frozen evaluation
 when the embedding model, chunking, corpus, or representative question set
 changes.
+
+## Lesson 10: single-agent tool orchestration
+
+ASA-8 adds `assistant_agent.py`, a runnable OpenAI Agents SDK entry point that
+registers the five read-only asset, maintenance, ticket, incident, and manual
+search tools. The model selects tools from the coordinator's question, and a
+combined question can use multiple tools in one run.
+
+Asset-dependent tools are enforced in code: `get_asset_details` must first
+validate the exact asset ID within the same run. An unknown or malformed ID
+therefore stops maintenance-history, related-incident, and manual-search calls
+instead of allowing the model to guess. Structured tool errors and unexpected
+tool exceptions are retained as user-visible limitations in the final result.
+
+Install the dependencies and build the generated manual index before asking a
+manual question:
+
+```bash
+python -m pip install -e .
+python manual_index.py ingest
+python assistant_agent.py "For VEH-1001, how should I inspect the sliding door?"
+```
+
+The assistant remains read-only and follows the safety and escalation rules at
+the top of this README. It does not diagnose faults, authorize repairs, operate
+equipment, or modify service records.

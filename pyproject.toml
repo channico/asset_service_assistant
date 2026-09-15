@@ -5,8 +5,23 @@ description = "Learning POC for an agent-assisted maintenance and service desk"
 requires-python = ">=3.11"
 dependencies = [
     "openai>=1.0",
+    "openai-agents>=0.22,<1",
     "python-dotenv>=1.0",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.setuptools]
+py-modules = [
+    "asset_repository",
+    "asset_tools",
+    "assistant_agent",
+    "evaluate_manual_search",
+    "main",
+    "manual_index",
+    "manual_repository",
+    "manual_tools",
+    "service_repository",
+    "validate_data",
+]
