@@ -1,0 +1,42 @@
+[
+  {
+    "asset_id": "VEH-1001",
+    "name": "North Service Van",
+    "asset_type": "service_van",
+    "manufacturer": "Ford",
+    "model": "Transit",
+    "year": 2022,
+    "location": "North Depot",
+    "status": "active"
+  },
+  {
+    "asset_id": "VEH-1002",
+    "name": "East Utility Truck",
+    "asset_type": "utility_truck",
+    "manufacturer": "Isuzu",
+    "model": "NPR",
+    "year": 2021,
+    "location": "East Depot",
+    "status": "in_service"
+  },
+  {
+    "asset_id": "EQP-2001",
+    "name": "Warehouse Forklift 1",
+    "asset_type": "forklift",
+    "manufacturer": "Toyota",
+    "model": "8FG25",
+    "year": 2020,
+    "location": "Central Warehouse",
+    "status": "active"
+  },
+  {
+    "asset_id": "EQP-2002",
+    "name": "Backup Generator",
+    "asset_type": "generator",
+    "manufacturer": "Caterpillar",
+    "model": "DE110E2",
+    "year": 2019,
+    "location": "West Service Centre",
+    "status": "out_of_service"
+  }
+]

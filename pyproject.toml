@@ -1,0 +1,9 @@
+[project]
+name = "asset-service-assistant"
+version = "0.1.0"
+description = "Learning POC for an agent-assisted maintenance and service desk"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
