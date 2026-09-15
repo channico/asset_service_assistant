@@ -147,3 +147,17 @@ deterministic interface that a later agent can call for an asset lookup:
 The response is a plain dictionary so it can be serialized as JSON. Successful
 responses keep tool metadata outside the `asset` object; the object itself has
 only fields loaded from the synthetic asset record.
+
+## Lesson 4: maintenance-history lookup
+
+ASA-5 adds `get_maintenance_history(asset_id, limit)` in `asset_tools.py` for
+retrieving all recorded maintenance events for one exact asset ID:
+
+- Results contain only events linked to that asset and are ordered newest first.
+- An optional positive-integer limit returns the newest matching events while
+  preserving both the returned and total event counts.
+- A known asset with no history returns an empty event list with an explanation.
+- Malformed IDs, unknown assets, and invalid limits return structured errors.
+
+Like the asset-details lookup, this tool is deterministic, read-only, and
+returns plain dictionaries suitable for later use by an agent.
