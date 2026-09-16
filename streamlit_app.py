@@ -189,7 +189,26 @@ def main() -> None:
         "approve, close, or dispatch work."
     )
 
-    st.subheader("Try a demonstration question")
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+
+    st.subheader("Ask a question")
+    with st.form("question-form", clear_on_submit=True):
+        typed_question = st.text_input(
+            "Your question",
+            placeholder=(
+                "Ask about an exact asset, service history, ticket, or manual guidance"
+            ),
+        )
+        st.caption(f'Example question: "{DEMO_QUESTIONS[0][2]}"')
+        typed_submitted = st.form_submit_button(
+            "Ask the assistant",
+            type="primary",
+            use_container_width=True,
+        )
+    st.caption("Press Enter or select **Ask the assistant** to submit.")
+
+    st.subheader("Or use a demonstration shortcut")
     demo_columns = st.columns(len(DEMO_QUESTIONS))
     selected_question: str | None = None
     for column, (title, description, question) in zip(
@@ -198,11 +217,18 @@ def main() -> None:
         with column:
             st.markdown(f"**{title}**")
             st.caption(description)
+            st.markdown(f"**Query:** {question}")
             if st.button("Run demo", key=f"demo-{title}", use_container_width=True):
                 selected_question = question
 
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
+    question: str | None = None
+    if typed_submitted:
+        question = typed_question.strip()
+        if not question:
+            st.warning("Enter a question before submitting.")
+            question = None
+    elif selected_question is not None:
+        question = selected_question
 
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
@@ -211,11 +237,7 @@ def main() -> None:
             else:
                 _render_result(message["result"])
 
-    typed_question = st.chat_input(
-        "Ask about an exact asset, service history, ticket, or manual guidance"
-    )
-    question = selected_question or typed_question
-    if question:
+    if question is not None:
         st.session_state.messages.append({"role": "user", "content": question})
         with st.chat_message("user"):
             st.markdown(question)

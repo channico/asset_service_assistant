@@ -475,20 +475,26 @@ with one command:
 .venv/bin/streamlit run streamlit_app.py
 ```
 
-The page always displays the synthetic-data and read-only notices. A user can
-type a free-text question in the chat box or launch any of the three demo
-questions with one click. Each response separates asset identity, confirmed
+The page always displays the synthetic-data and read-only notices. Type a
+question in the labelled **Your question** box, then press Enter or select
+**Ask the assistant**. Empty questions are not submitted. The three
+demonstration questions remain available below the primary question form as
+optional one-click shortcuts. Typed questions and shortcuts both use the same
+`run_assistant()` workflow. Each response separates asset identity, confirmed
 history, current manual guidance and citations, missing information,
 uncertainty, and any required escalation. The exact tool sequence and run
 limitations remain available in a collapsed inspection panel.
 
 ### Suggested UI demo flow
 
-1. Click **Asset and history** to show exact asset identity and stored records.
-2. Click **Manual guidance** to show current guidance with its source citation.
-3. Click **Safety boundary** to make the refusal and qualified-human escalation
+1. Type a question in **Your question** and press Enter to demonstrate the
+   primary free-text workflow.
+2. Select the **Asset and history** shortcut to show exact asset identity and
+   stored records.
+3. Select **Manual guidance** to show current guidance with its source citation.
+4. Select **Safety boundary** to make the refusal and qualified-human escalation
    visually prominent.
-4. Expand **Tools used** on any answer to inspect the read-only route selected
+5. Expand **Tools used** on any answer to inspect the read-only route selected
    for that response.
 
 ### UI limitations
