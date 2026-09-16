@@ -8,7 +8,7 @@ import os
 from dataclasses import dataclass, field
 from typing import Any, Callable
 
-from agents import Agent, RunContextWrapper, Runner, function_tool
+from agents import Agent, ModelSettings, RunContextWrapper, Runner, function_tool
 from dotenv import load_dotenv
 
 from asset_tools import (
@@ -39,7 +39,8 @@ Tool routing:
   the format TKT-0001. Never pass an MNT maintenance-event ID to get_ticket.
 - Before get_maintenance_history, find_similar_incidents, or search_manual,
   first call get_asset_details with that exact asset ID. Continue only when it
-  returns status "found".
+  returns status "found". Call dependent tools in a later tool round; never
+  bundle them with the asset-validation call.
 - Use get_maintenance_history for recorded service history.
 - Use find_similar_incidents only for historical same-model incident evidence;
   never present it as a diagnosis.
@@ -345,6 +346,7 @@ def create_agent(model: str | None = None) -> Agent[ToolExecutionContext]:
         instructions=AGENT_INSTRUCTIONS,
         tools=TOOLS,
         model=model,
+        model_settings=ModelSettings(parallel_tool_calls=False),
         output_type=ServiceAnswer,
     )
 

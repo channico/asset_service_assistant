@@ -115,6 +115,12 @@ class AgentOrchestrationTests(unittest.TestCase):
         self.assertIn("Never pass an MNT", AGENT_INSTRUCTIONS)
         self.assertIs(agent.output_type, ServiceAnswer)
 
+    def test_asset_dependent_tools_cannot_run_in_parallel(self) -> None:
+        agent = create_agent("test-model")
+
+        self.assertFalse(agent.model_settings.parallel_tool_calls)
+        self.assertIn("in a later tool round", AGENT_INSTRUCTIONS)
+
     def test_run_passes_question_context_and_agent_to_runner(self) -> None:
         captured = {}
 

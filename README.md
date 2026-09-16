@@ -297,6 +297,8 @@ validate the exact asset ID within the same run. An unknown or malformed ID
 therefore stops maintenance-history, related-incident, and manual-search calls
 instead of allowing the model to guess. Structured tool errors and unexpected
 tool exceptions are retained as user-visible limitations in the final result.
+Tool calls run sequentially so a dependent lookup cannot race ahead of the
+successful asset-validation call that enables it.
 
 Install the dependencies and build the generated manual index before asking a
 manual question:
