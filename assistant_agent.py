@@ -98,6 +98,7 @@ class AssistantResult:
     answer: str
     tool_calls: tuple[str, ...]
     limitations: tuple[str, ...]
+    service_answer: ServiceAnswer | None = None
 
 
 def _record_result(
@@ -384,14 +385,21 @@ def run_assistant(
             "The assistant could not complete the request because the agent "
             f"run failed ({type(error).__name__})."
         )
-        answer = render_service_answer(
-            ensure_required_escalation(question, failure_answer(message))
+        final_output = ensure_required_escalation(
+            question, failure_answer(message)
         )
-        return AssistantResult(answer, tuple(context.tool_calls), (message,))
+        answer = render_service_answer(final_output)
+        return AssistantResult(
+            answer,
+            tuple(context.tool_calls),
+            (message,),
+            final_output,
+        )
     return AssistantResult(
         answer,
         tuple(context.tool_calls),
         tuple(context.limitations),
+        final_output,
     )
 
 

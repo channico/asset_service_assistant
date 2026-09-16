@@ -139,6 +139,7 @@ class AgentOrchestrationTests(unittest.TestCase):
         self.assertIn("## Confirmed history", result.answer)
         self.assertIn("## Manual guidance", result.answer)
         self.assertIn("## Missing information and uncertainty", result.answer)
+        self.assertIsInstance(result.service_answer, ServiceAnswer)
         self.assertEqual(captured["question"], "Show asset VEH-1001 and its history")
         self.assertIsInstance(captured["kwargs"]["context"], ToolExecutionContext)
         self.assertEqual(captured["kwargs"]["max_turns"], 10)
@@ -153,6 +154,7 @@ class AgentOrchestrationTests(unittest.TestCase):
         self.assertIn("RuntimeError", result.answer)
         self.assertEqual(len(result.limitations), 1)
         self.assertIn("RuntimeError", result.limitations[0])
+        self.assertIsInstance(result.service_answer, ServiceAnswer)
 
     def test_wrong_final_output_type_becomes_structured_limitation(self) -> None:
         def wrong_output_runner(*args, **kwargs):

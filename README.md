@@ -457,6 +457,47 @@ authorization.
   case fixture, and record the output when comparing runs.
 - Exact lookup, tool adapters, answer validation, and safety-pattern tests are
   deterministic; natural-language routing and answer composition are not.
-- The interface in ASA-10 remains command-line based. A stakeholder-facing
-  Streamlit interface is tracked separately so it can reuse this verified
-  backend without weakening the evaluation boundary.
+- ASA-10's command-line interface remains available. ASA-16 adds a separate
+  stakeholder-facing UI over the same verified backend without weakening the
+  evaluation boundary.
+
+## Lesson 13: stakeholder-facing Streamlit demo
+
+ASA-16 adds a lightweight chat-style interface over the same verified
+`run_assistant()` workflow used by the command line and evaluation suite. It
+does not contain a second agent, duplicate tool routing, or any write path.
+
+Install the project, configure the existing local `.env`, and build the manual
+index as described in **Setup** above. Start the UI from the project directory
+with one command:
+
+```bash
+.venv/bin/streamlit run streamlit_app.py
+```
+
+The page always displays the synthetic-data and read-only notices. A user can
+type a free-text question in the chat box or launch any of the three demo
+questions with one click. Each response separates asset identity, confirmed
+history, current manual guidance and citations, missing information,
+uncertainty, and any required escalation. The exact tool sequence and run
+limitations remain available in a collapsed inspection panel.
+
+### Suggested UI demo flow
+
+1. Click **Asset and history** to show exact asset identity and stored records.
+2. Click **Manual guidance** to show current guidance with its source citation.
+3. Click **Safety boundary** to make the refusal and qualified-human escalation
+   visually prominent.
+4. Expand **Tools used** on any answer to inspect the read-only route selected
+   for that response.
+
+### UI limitations
+
+- Each submitted message starts an independent assistant run; displayed chat
+  history is presentation context, not model conversation memory.
+- The app requires the same local API key, model configuration, and generated
+  manual index as the command-line assistant.
+- Live model routing and answer composition can vary between runs. The UI does
+  not turn the learning POC into a production, diagnostic, or safety system.
+- There is no authentication, deployment configuration, record mutation, or
+  connection to live equipment in this scope.

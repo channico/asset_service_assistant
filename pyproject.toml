@@ -8,6 +8,7 @@ dependencies = [
     "openai-agents>=0.22,<1",
     "pydantic>=2.0,<3",
     "python-dotenv>=1.0",
+    "streamlit>=1.40,<2",
 ]
 
 [tool.pytest.ini_options]
@@ -26,5 +27,6 @@ py-modules = [
     "manual_tools",
     "service_repository",
     "service_answer",
+    "streamlit_app",
     "validate_data",
 ]
