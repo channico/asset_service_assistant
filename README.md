@@ -82,10 +82,10 @@ next step. It must not invent measurements, records, citations, or conclusions.
 ## Run
 
 ```bash
-python main.py
-python main.py VEH-1001
-python main.py VEH-9999
-python assistant_agent.py "Show asset VEH-1001 and its maintenance history"
+.venv/bin/python main.py
+.venv/bin/python main.py VEH-1001
+.venv/bin/python main.py VEH-9999
+.venv/bin/python assistant_agent.py "Show asset VEH-1001 and its maintenance history"
 ```
 
 ## Lesson 1: synthetic asset data
@@ -326,3 +326,137 @@ section is added when the safety rules require qualified review. Manual
 citations are also checked against the passages actually returned by
 `search_manual`, so a plausible-looking but unretrieved citation cannot be
 presented as evidence.
+
+## Lesson 12: repeatable assistant evaluation and command-line demo
+
+ASA-10 adds an assistant-level evaluation suite on top of the existing
+retrieval calibration. The retrieval evaluation checks whether manual search
+selects or rejects the expected passage. The assistant evaluation checks the
+larger behavior that a demonstration depends on: tool routing, exact-ID
+validation, structured evidence, citations, missing information, refusals, and
+safety escalation.
+
+See `DEMO_GUIDE.md` for the presentation flow, an explanation of live-result
+variation, and the future hardening TODOs that follow from those observations.
+
+The architecture remains deliberately small:
+
+```text
+Synthetic JSON records and versioned manuals
+                    |
+                    v
+      Deterministic read-only Python tools
+                    |
+                    v
+   OpenAI Agents SDK routing in assistant_agent.py
+                    |
+                    v
+     Validated ServiceAnswer and Markdown renderer
+                    |
+          +---------+---------+
+          |                   |
+          v                   v
+ Command-line demo     ASA-10 evaluation runner
+```
+
+### Setup
+
+The commands below assume the repository's local virtual environment. If it
+does not exist yet, create it and install the project:
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -e .
+cp .env.example .env
+```
+
+Set `OPENAI_API_KEY` and an explicit `ASA_AGENT_MODEL` in the ignored `.env`
+file. The model identifier is recorded explicitly for evaluation runs because
+model behavior can change over time. Build and verify the generated manual
+index before running questions that need manual guidance:
+
+```bash
+.venv/bin/python manual_index.py ingest
+.venv/bin/python manual_index.py check
+```
+
+### Automated checks
+
+Run the deterministic data validation and offline unit suite first. The unit
+tests inject fake model and embedding behavior and do not call the OpenAI API:
+
+```bash
+.venv/bin/python validate_data.py
+.venv/bin/python -m unittest discover -s tests -v
+```
+
+The 12 versioned assistant cases are in
+`evaluation/assistant_cases.json`, and the latest complete run is summarized in
+`evaluation/assistant_evaluation_results.md`. Each case records its required
+and forbidden tools, validation-order constraints, and expected answer
+characteristics. Run all cases using the explicit model configured in `.env`:
+
+```bash
+.venv/bin/python evaluate_assistant.py
+```
+
+Alternatively, pass `--model` directly. Run one case while developing or save
+a machine-readable report:
+
+```bash
+.venv/bin/python evaluate_assistant.py \
+  --model gpt-4.1-mini \
+  --case conflicting-ticket-claim
+
+.venv/bin/python evaluate_assistant.py \
+  --model gpt-4.1-mini \
+  --json-output evaluation/assistant_evaluation_run.json
+```
+
+The JSON report includes the model, PASS/FAIL result, observed tool calls,
+limitations, and complete rendered answer for each case. A saved report is a
+snapshot of one run, not proof that every future model run will be identical.
+
+### Three-question demonstration flow
+
+These questions show the POC's main value and its safety boundary without
+requiring the audience to understand the implementation:
+
+1. Exact data and history:
+
+   ```bash
+   .venv/bin/python assistant_agent.py \
+     "Show asset VEH-1001 and its recorded maintenance history."
+   ```
+
+2. Grounded manual guidance with a current citation:
+
+   ```bash
+   .venv/bin/python assistant_agent.py \
+     "For VEH-1001, what should I record if the sliding door has resistance, abnormal noise, or incomplete latching?"
+   ```
+
+3. Safe failure for an unsupported decision:
+
+   ```bash
+   .venv/bin/python assistant_agent.py \
+     "For VEH-1001, diagnose the fault, prescribe the exact repair, and confirm it is safe to drive."
+   ```
+
+The first demonstrates deterministic structured records, the second shows
+model routing plus citable retrieval, and the third shows that the assistant
+does not turn retrieved information into a diagnosis or return-to-service
+authorization.
+
+### Evaluation limitations
+
+- The records, manuals, and evaluation questions are synthetic and small.
+- Passing cases demonstrate expected POC behavior, not production reliability
+  or safety certification.
+- Agent evaluations use a live model and can vary. Pin the model, retain the
+  case fixture, and record the output when comparing runs.
+- Exact lookup, tool adapters, answer validation, and safety-pattern tests are
+  deterministic; natural-language routing and answer composition are not.
+- The interface in ASA-10 remains command-line based. A stakeholder-facing
+  Streamlit interface is tracked separately so it can reuse this verified
+  backend without weakening the evaluation boundary.

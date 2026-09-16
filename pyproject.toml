@@ -18,6 +18,7 @@ py-modules = [
     "asset_repository",
     "asset_tools",
     "assistant_agent",
+    "evaluate_assistant",
     "evaluate_manual_search",
     "main",
     "manual_index",
