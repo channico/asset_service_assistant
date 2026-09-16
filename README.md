@@ -310,3 +310,17 @@ python assistant_agent.py "For VEH-1001, how should I inspect the sliding door?"
 The assistant remains read-only and follows the safety and escalation rules at
 the top of this README. It does not diagnose faults, authorize repairs, operate
 equipment, or modify service records.
+
+## Lesson 11: structured evidence-based service answers
+
+ASA-9 adds a typed `ServiceAnswer` output to the single-agent workflow. The
+answer keeps exact asset identity and stored history separate from manual
+recommendations, and every manual recommendation requires a current source
+citation containing the manual, section, version, and source file.
+
+The renderer always shows asset identity, confirmed history, manual guidance,
+and missing information or uncertainty as separate sections. An escalation
+section is added when the safety rules require qualified review. Manual
+citations are also checked against the passages actually returned by
+`search_manual`, so a plausible-looking but unretrieved citation cannot be
+presented as evidence.

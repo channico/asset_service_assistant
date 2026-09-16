@@ -12,6 +12,19 @@ from assistant_agent import (
     create_agent,
     run_assistant,
 )
+from service_answer import ServiceAnswer
+
+
+def empty_service_answer(summary: str = "Grounded answer") -> ServiceAnswer:
+    return ServiceAnswer(
+        summary=summary,
+        asset_identity=None,
+        confirmed_history=[],
+        manual_guidance=[],
+        missing_information=[],
+        uncertainties=[],
+        escalation=None,
+    )
 
 
 class ToolAdapterTests(unittest.TestCase):
@@ -100,13 +113,14 @@ class AgentOrchestrationTests(unittest.TestCase):
         self.assertIn("Do not call a dependent tool", AGENT_INSTRUCTIONS)
         self.assertIn("Cite the returned", AGENT_INSTRUCTIONS)
         self.assertIn("Never pass an MNT", AGENT_INSTRUCTIONS)
+        self.assertIs(agent.output_type, ServiceAnswer)
 
     def test_run_passes_question_context_and_agent_to_runner(self) -> None:
         captured = {}
 
         def fake_runner(agent, question, **kwargs):
             captured.update(agent=agent, question=question, kwargs=kwargs)
-            return SimpleNamespace(final_output="Grounded answer")
+            return SimpleNamespace(final_output=empty_service_answer())
 
         result = run_assistant(
             "  Show asset VEH-1001 and its history  ",
@@ -114,7 +128,11 @@ class AgentOrchestrationTests(unittest.TestCase):
             runner=fake_runner,
         )
 
-        self.assertEqual(result.answer, "Grounded answer")
+        self.assertTrue(result.answer.startswith("Grounded answer"))
+        self.assertIn("## Asset identity", result.answer)
+        self.assertIn("## Confirmed history", result.answer)
+        self.assertIn("## Manual guidance", result.answer)
+        self.assertIn("## Missing information and uncertainty", result.answer)
         self.assertEqual(captured["question"], "Show asset VEH-1001 and its history")
         self.assertIsInstance(captured["kwargs"]["context"], ToolExecutionContext)
         self.assertEqual(captured["kwargs"]["max_turns"], 10)
@@ -127,7 +145,17 @@ class AgentOrchestrationTests(unittest.TestCase):
 
         self.assertIn("could not complete", result.answer)
         self.assertIn("RuntimeError", result.answer)
-        self.assertEqual(result.limitations, (result.answer,))
+        self.assertEqual(len(result.limitations), 1)
+        self.assertIn("RuntimeError", result.limitations[0])
+
+    def test_wrong_final_output_type_becomes_structured_limitation(self) -> None:
+        def wrong_output_runner(*args, **kwargs):
+            return SimpleNamespace(final_output="free-form answer")
+
+        result = run_assistant("Show VEH-1001", runner=wrong_output_runner)
+
+        self.assertIn("TypeError", result.answer)
+        self.assertIn("## Missing information and uncertainty", result.answer)
 
     def test_blank_question_is_rejected_before_runner(self) -> None:
         with self.assertRaisesRegex(ValueError, "non-empty"):

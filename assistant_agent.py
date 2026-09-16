@@ -18,6 +18,14 @@ from asset_tools import (
     get_ticket,
 )
 from manual_tools import search_manual
+from service_answer import (
+    ServiceAnswer,
+    add_context_limitations,
+    ensure_required_escalation,
+    failure_answer,
+    render_service_answer,
+    validate_manual_citations,
+)
 
 
 AGENT_INSTRUCTIONS = """You are the read-only Asset Service Assistant for a
@@ -40,6 +48,21 @@ Tool routing:
   superseded passage as current guidance.
 - For a combined question, call every relevant tool before answering, but do
   not call tools unrelated to the user's requested information.
+
+Final answer composition:
+- Return the final answer as the required ServiceAnswer structured output.
+- Copy asset_identity only from a successful get_asset_details result.
+- Put stored asset, maintenance, ticket, and historical-incident statements in
+  confirmed_history. Include each statement's exact record ID and source type.
+- Put recommendations derived from current manual passages only in
+  manual_guidance. Every recommendation must include the exact manual title and
+  ID, section title and ID, version, version status, and source file returned by
+  search_manual. Do not use a superseded passage as a recommendation.
+- Put absent, conflicting, unavailable, or unsupported evidence in
+  missing_information. Put conclusions that the evidence cannot establish in
+  uncertainties. Never fill either kind of gap from general knowledge.
+- Include escalation when a project safety rule requires it. State the rule,
+  available evidence, unknowns, immediate safe action, and qualified reviewer.
 
 Failure and safety behavior:
 - If a tool returns not_found, invalid_request, unavailable, or an error, state
@@ -64,6 +87,7 @@ class ToolExecutionContext:
     validated_asset_ids: set[str] = field(default_factory=set)
     tool_calls: list[str] = field(default_factory=list)
     limitations: list[str] = field(default_factory=list)
+    tool_results: list[tuple[str, dict[str, Any]]] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -81,6 +105,7 @@ def _record_result(
     result: dict[str, Any],
 ) -> dict[str, Any]:
     context.tool_calls.append(tool_name)
+    context.tool_results.append((tool_name, result))
     error = result.get("error")
     if isinstance(error, dict) and isinstance(error.get("message"), str):
         message = error["message"].strip()
@@ -320,6 +345,7 @@ def create_agent(model: str | None = None) -> Agent[ToolExecutionContext]:
         instructions=AGENT_INSTRUCTIONS,
         tools=TOOLS,
         model=model,
+        output_type=ServiceAnswer,
     )
 
 
@@ -344,23 +370,22 @@ def run_assistant(
             context=context,
             max_turns=10,
         )
-        answer = str(result.final_output).strip()
+        final_output = result.final_output
+        if not isinstance(final_output, ServiceAnswer):
+            raise TypeError("Agent did not return the required ServiceAnswer output.")
+        validate_manual_citations(final_output, context.tool_results)
+        final_output = add_context_limitations(final_output, context.limitations)
+        final_output = ensure_required_escalation(question, final_output)
+        answer = render_service_answer(final_output)
     except Exception as error:
         message = (
             "The assistant could not complete the request because the agent "
             f"run failed ({type(error).__name__})."
         )
-        return AssistantResult(message, tuple(context.tool_calls), (message,))
-
-    missing_limitations = [
-        message
-        for message in context.limitations
-        if message.casefold() not in answer.casefold()
-    ]
-    if missing_limitations:
-        answer = f"{answer}\n\nLimitations:\n" + "\n".join(
-            f"- {message}" for message in missing_limitations
+        answer = render_service_answer(
+            ensure_required_escalation(question, failure_answer(message))
         )
+        return AssistantResult(answer, tuple(context.tool_calls), (message,))
     return AssistantResult(
         answer,
         tuple(context.tool_calls),
