@@ -1,368 +1,46 @@
 # Asset Service Assistant
 
-A small learning project that combines structured asset records, maintenance
-history, service tickets, manual retrieval, and agent tool selection.
-
-## POC scope
-
-### Primary user
-
-The primary user is a **maintenance service-desk coordinator** who needs to
-find reliable information while triaging an asset-related question. The
-assistant supports the coordinator; it does not replace a qualified technician
-or make maintenance decisions on the coordinator's behalf.
-
-### Supported question types
-
-The POC supports exactly three question types:
-
-1. **Asset lookup:** retrieve a synthetic vehicle or equipment record by its
-   exact asset ID, including its location and current recorded status.
-2. **Service-history lookup:** retrieve synthetic maintenance history and
-   service tickets associated with an exact asset or ticket ID.
-3. **Manual guidance:** answer informational maintenance questions using the
-   supplied short manuals, with citations to the supporting text.
-
-Answers must be based on retrieved project data. The assistant must distinguish
-facts in that evidence from any general explanation it provides.
-
-### Boundaries and non-goals
-
-- All asset, maintenance, and ticket records are synthetic. Real operational,
-  customer, employee, telemetry, or production data is outside the POC.
-- Every tool is read-only. The assistant cannot create, update, close, approve,
-  or dispatch service work.
-- The assistant cannot connect to or control a live vehicle, machine, sensor,
-  diagnostic system, or maintenance platform.
-- It cannot start, stop, isolate, reset, configure, or otherwise operate
-  equipment.
-- It does not diagnose faults, authorize continued operation, prescribe an
-  automatic repair, certify safety, or replace inspection by a qualified
-  technician.
-
-## Safety and escalation rules
-
-The assistant must abstain or escalate whenever any rule below applies. These
-rules are deterministic: if the condition is present, the assistant must not
-provide a speculative answer or operational instruction.
-
-1. **Missing or unknown identifier:** If a required asset or ticket ID is
-   absent or has no exact match, ask for a valid ID; do not guess a likely
-   record.
-2. **Ambiguous identity:** If records conflict or more than one record could
-   identify the asset, stop and ask the coordinator to resolve the identity.
-3. **Missing or conflicting evidence:** If the project data does not support an
-   answer, or sources disagree, say what is missing and escalate to the record
-   owner or a qualified technician.
-4. **Safety-critical symptom:** If the question mentions fire, smoke, fuel or
-   chemical leakage, exposed electrical parts, brake or steering failure,
-   uncontrolled movement, or serious-injury risk, advise the user to stop using
-   the asset when safe to do so and contact the appropriate emergency process
-   and a qualified technician.
-5. **Live control or data mutation:** Refuse requests to operate equipment or to
-   create, alter, approve, close, or dispatch records or work orders.
-6. **Repair or return-to-service decision:** Do not provide a definitive fault
-   diagnosis, authorize a repair, confirm that a repair succeeded, or declare
-   an asset safe to use. Escalate to a qualified technician.
-7. **Safety-control bypass:** Refuse instructions to disable guards, alarms,
-   interlocks, lockout/tagout measures, or manufacturer safety procedures.
-
-When escalating, the response should identify the triggering rule, summarize
-the available evidence, state what remains unknown, and name the appropriate
-next step. It must not invent measurements, records, citations, or conclusions.
-
-## Planned learning stages
-
-1. Create and query synthetic asset data.
-2. Add deterministic lookup tools.
-3. Reuse the existing RAG concepts for manual search.
-4. Let one agent select the appropriate tools.
-5. Add evaluation cases for correct routing, missing IDs, and safe abstention.
-
-## Run
-
-```bash
-.venv/bin/python main.py
-.venv/bin/python main.py VEH-1001
-.venv/bin/python main.py VEH-9999
-.venv/bin/python assistant_agent.py "Show asset VEH-1001 and its maintenance history"
-```
-
-## Lesson 1: synthetic asset data
-
-This first increment deliberately has only three layers:
-
-1. `data/assets/assets.json` is the replaceable data source.
-2. `asset_repository.py` validates, loads, and queries that source.
-3. `main.py` is a small user interface over the repository functions.
-
-The separation matters: later, an agent tool can call `find_asset()` without
-knowing whether the records came from JSON, a database, or an external system.
-The data is synthetic, so experiments cannot expose or modify real asset data.
-
-Run the tests with Python's built-in test runner:
-
-```bash
-python -m unittest discover -s tests -v
-```
-
-Validate all four datasets directly:
-
-```bash
-python validate_data.py
-```
-
-### Try it yourself
-
-- Add one new asset to the JSON file and confirm that the list shows eleven.
-- Give two records the same `asset_id` and observe the validation error.
-- Restore unique IDs, then add a new valid status in both the data and
-  `VALID_STATUSES`.
-
-## Lesson 2: linked service data
-
-ASA-3 adds two child record types to the asset data model:
-
-- A maintenance event records its `maintenance_id`, parent `asset_id`, service
-  date, maintenance type, reported symptom, action, repair outcome, and status.
-- A service ticket records its `ticket_id`, parent `asset_id`, opened and closed
-  dates, status, priority, symptom, and optional repair outcome.
-
-The `asset_id` values act like foreign keys: they connect each event or ticket
-to exactly one asset. `service_repository.py` validates required identifiers,
-ISO-formatted dates, allowed status values, unique record IDs, and references
-to missing assets. The validation command currently checks 10 assets, 15
-maintenance events, and 10 service tickets.
-
-## Lesson 3: exact asset-details lookup
-
-ASA-4 adds `get_asset_details(asset_id)` in `asset_tools.py`. This is the
-deterministic interface that a later agent can call for an asset lookup:
-
-- A valid ID returns a `found` result containing the exact stored asset fields.
-- An unknown, partial, blank, or non-text ID returns a structured `not_found`
-  result instead of guessing a likely asset.
-- Matching ignores letter case and surrounding whitespace, but does not use
-  fuzzy or semantic similarity.
-
-The response is a plain dictionary so it can be serialized as JSON. Successful
-responses keep tool metadata outside the `asset` object; the object itself has
-only fields loaded from the synthetic asset record.
-
-## Lesson 4: maintenance-history lookup
-
-ASA-5 adds `get_maintenance_history(asset_id, limit)` in `asset_tools.py` for
-retrieving all recorded maintenance events for one exact asset ID:
-
-- Results contain only events linked to that asset and are ordered newest first.
-- An optional positive-integer limit returns the newest matching events while
-  preserving both the returned and total event counts.
-- A known asset with no history returns an empty event list with an explanation.
-- Malformed IDs, unknown assets, and invalid limits return structured errors.
-
-Like the asset-details lookup, this tool is deterministic, read-only, and
-returns plain dictionaries suitable for later use by an agent.
-
-## Lesson 5: ticket lookup and related incidents
-
-ASA-6 adds two deterministic service-ticket tools in `asset_tools.py`:
-
-- `get_ticket(ticket_id)` retrieves one exact ticket and labels the result as
-  an `exact_ticket`; unknown, malformed, and near-match IDs are not guessed.
-- `find_similar_incidents(asset_id, symptom)` considers only resolved tickets
-  with a close date for the same stored asset model. It compares normalized
-  words in the supplied symptom with the tickets' stored `symptom_tags`.
-
-Each related incident is labeled `related_incident` and includes the asset
-model, matching symptom tags, and close date as evidence. The response also
-states that historical incidents do not prove the cause of a current symptom;
-the tool is a retrieval aid, not a diagnostic system.
-
-## Lesson 6: versioned maintenance-manual corpus
-
-ASA-11 adds four short synthetic manuals under `data/manuals/` and validates
-them through `manual_repository.py`. Each manual records a stable ID, title,
-manufacturer, applicable asset model, version, version status, and structured
-sections. Section IDs are unique within their manual, and every section has a
-title and non-empty passage text.
-
-The corpus deliberately contains both current and superseded versions of the
-Ford Transit guide. Version status is explicit metadata rather than something
-later retrieval code must infer from a filename or publication order.
-
-`validate_manual_applicability()` also checks that every manual's manufacturer
-and model pair exists in the synthetic asset data. Not every asset needs a
-manual in this small POC, but an orphaned manual cannot silently enter the
-search corpus.
-
-This increment performs no embedding or generative-model calls. It establishes
-the validated source records that the next increment will chunk and embed.
-
-## Lesson 7: persistent manual embedding index
-
-ASA-12 adds an explicit ingestion step that keeps embedding work separate from
-later manual queries. Install the project dependencies, copy `.env.example` to
-an ignored `.env`, and set `OPENAI_API_KEY` locally. Never commit or paste the
-key into source code.
-
-Build the generated index from the current manual corpus:
-
-```bash
-python -m pip install -e .
-python manual_index.py ingest
-```
-
-The command chunks each structured manual section, embeds all chunks in one
-batch with `text-embedding-3-small`, and writes `data/manual_index.json`. Each
-record retains the document title, section ID and title, version and status,
-manufacturer, applicable model, source filename, passage, and embedding.
-
-The index also stores its format version, embedding model, chunking settings,
-embedding dimensions, and SHA-256 fingerprints of every source manual. Verify
-that a generated index remains usable without making an API request:
-
-```bash
-python manual_index.py check
-```
-
-A missing index, changed manual corpus, different embedding model, different
-chunking configuration, or unsupported index format produces an actionable
-error asking for re-ingestion. The generated index is rebuildable data and is
-ignored by Git.
-
-## Lesson 8: asset-model-filtered manual search
-
-ASA-13 adds `search_manual(asset_id, question)` in `manual_tools.py`. The tool
-first resolves the exact stored asset, then filters the index to that asset's
-manufacturer and model before calculating any cosine similarities. A Ford
-Transit question therefore cannot retrieve guidance for a Toyota forklift,
-even if the wording is highly similar.
-
-Search results are ordered by descending similarity and retain inspectable
-evidence: document and section citations, source filename, passage text, and
-version metadata. Current guidance is labelled `CURRENT`; superseded passages
-are labelled `SUPERSEDED - DO NOT TREAT AS CURRENT GUIDANCE`. The retrieval
-stage introduced here did not yet impose a relevance threshold; Lesson 9 adds
-the calibrated abstention behavior.
-
-Unknown or malformed assets and blank or non-text questions return structured
-errors. The unit tests inject deterministic embeddings, so running the test
-suite does not make an API request.
-
-## Lesson 9: calibrated manual-search abstention
-
-ASA-14 adds a frozen cosine-similarity threshold of `0.40` and a default
-`top_k` of three. Search still filters by the asset's exact manufacturer and
-model first. It then scores and deterministically sorts every applicable
-candidate before applying the threshold and result limit.
-
-When no passage reaches the threshold, `search_manual()` returns
-`status: "abstained"`, an empty `results` list, and an explanation that no
-citation can be provided. Unsupported and wrong-model questions therefore do
-not receive a low-confidence passage disguised as evidence.
-
-The ingestion and search workflow is:
-
-```bash
-python manual_index.py ingest
-python manual_index.py check
-python evaluate_manual_search.py
-```
-
-Ingestion embeds the current versioned manual corpus and persists section-level
-citations and applicability metadata in the generated index. Search embeds the
-question, restricts candidates to the exact asset model, and returns passage,
-document, section, source-file, similarity, and version evidence. Current and
-superseded passages remain clearly labelled; a superseded citation must never
-be presented as current guidance.
-
-The calibration fixtures are in `evaluation/manual_search_cases.json`, and the
-recorded scores and held-out results are in
-`evaluation/manual_search_results.md`. The threshold was selected only from
-the calibration cases and frozen before the held-out cases ran. The evaluation
-tests retrieval evidence—not generative answer quality—and is POC evidence,
-not production or safety validation. Recalibrate with a new frozen evaluation
-when the embedding model, chunking, corpus, or representative question set
-changes.
-
-## Lesson 10: single-agent tool orchestration
-
-ASA-8 adds `assistant_agent.py`, a runnable OpenAI Agents SDK entry point that
-registers the five read-only asset, maintenance, ticket, incident, and manual
-search tools. The model selects tools from the coordinator's question, and a
-combined question can use multiple tools in one run.
-
-Asset-dependent tools are enforced in code: `get_asset_details` must first
-validate the exact asset ID within the same run. An unknown or malformed ID
-therefore stops maintenance-history, related-incident, and manual-search calls
-instead of allowing the model to guess. Structured tool errors and unexpected
-tool exceptions are retained as user-visible limitations in the final result.
-Tool calls run sequentially so a dependent lookup cannot race ahead of the
-successful asset-validation call that enables it.
-
-Install the dependencies and build the generated manual index before asking a
-manual question:
-
-```bash
-python -m pip install -e .
-python manual_index.py ingest
-python assistant_agent.py "For VEH-1001, how should I inspect the sliding door?"
-```
-
-The assistant remains read-only and follows the safety and escalation rules at
-the top of this README. It does not diagnose faults, authorize repairs, operate
-equipment, or modify service records.
-
-## Lesson 11: structured evidence-based service answers
-
-ASA-9 adds a typed `ServiceAnswer` output to the single-agent workflow. The
-answer keeps exact asset identity and stored history separate from manual
-recommendations, and every manual recommendation requires a current source
-citation containing the manual, section, version, and source file.
-
-The renderer always shows asset identity, confirmed history, manual guidance,
-and missing information or uncertainty as separate sections. An escalation
-section is added when the safety rules require qualified review. Manual
-citations are also checked against the passages actually returned by
-`search_manual`, so a plausible-looking but unretrieved citation cannot be
-presented as evidence.
-
-## Lesson 12: repeatable assistant evaluation and command-line demo
-
-ASA-10 adds an assistant-level evaluation suite on top of the existing
-retrieval calibration. The retrieval evaluation checks whether manual search
-selects or rejects the expected passage. The assistant evaluation checks the
-larger behavior that a demonstration depends on: tool routing, exact-ID
-validation, structured evidence, citations, missing information, refusals, and
-safety escalation.
-
-See `DEMO_GUIDE.md` for the presentation flow, an explanation of live-result
-variation, and the future hardening TODOs that follow from those observations.
-
-The architecture remains deliberately small:
-
-```text
-Synthetic JSON records and versioned manuals
-                    |
-                    v
-      Deterministic read-only Python tools
-                    |
-                    v
-   OpenAI Agents SDK routing in assistant_agent.py
-                    |
-                    v
-     Validated ServiceAnswer and Markdown renderer
-                    |
-          +---------+---------+
-          |                   |
-          v                   v
- Command-line demo     ASA-10 evaluation runner
-```
-
-### Setup
-
-The commands below assume the repository's local virtual environment. If it
-does not exist yet, create it and install the project:
+Asset Service Assistant is a learning proof of concept for a maintenance
+service-desk coordinator. It combines exact synthetic asset and service records,
+versioned maintenance manuals, semantic retrieval, and one OpenAI Agents SDK
+agent that selects read-only tools and returns a structured, evidence-based
+answer.
+
+The POC supports three use cases:
+
+1. Look up a synthetic vehicle or equipment record by exact asset ID.
+2. Retrieve synthetic maintenance history or a service ticket by exact ID.
+3. Retrieve informational manual guidance with an inspectable current-source
+   citation.
+
+## Boundaries
+
+- All records, manuals, and evaluation questions are synthetic.
+- Every project tool is read-only. The assistant cannot operate equipment or
+  create, change, approve, close, or dispatch work.
+- The assistant does not diagnose faults, prescribe repairs, authorize
+  continued operation, certify safety, or replace a qualified technician.
+- Missing, ambiguous, conflicting, or safety-critical evidence triggers
+  abstention or escalation rather than a guessed answer.
+- This is a local learning POC, not a production maintenance system or safety
+  authority, and it has no connection to live equipment or operational data.
+
+## Capabilities
+
+- Validated JSON repositories for assets, maintenance events, service tickets,
+  and versioned manuals.
+- Deterministic exact-ID lookup tools and same-model incident retrieval.
+- Asset-model-filtered manual search with a persistent embedding index,
+  calibrated abstention, version labels, and citations.
+- Sequential Agents SDK orchestration with exact asset validation before
+  dependent tools.
+- Typed `ServiceAnswer` validation and consistent Markdown/Streamlit rendering.
+- A command-line assistant, stakeholder-facing Streamlit UI, offline tests, and
+  retrieval and live-agent evaluation suites.
+
+## Quick start
+
+Python 3.11 or later is required. From the repository root:
 
 ```bash
 python3 -m venv .venv
@@ -370,140 +48,24 @@ python3 -m venv .venv
 cp .env.example .env
 ```
 
-Set `OPENAI_API_KEY` and an explicit `ASA_AGENT_MODEL` in the ignored `.env`
-file. The model identifier is recorded explicitly for evaluation runs because
-model behavior can change over time. Build and verify the generated manual
-index before running questions that need manual guidance:
+Add `OPENAI_API_KEY` and `ASA_AGENT_MODEL` to the ignored `.env` file, then
+build the generated manual index and start the UI:
 
 ```bash
 .venv/bin/python manual_index.py ingest
-.venv/bin/python manual_index.py check
-```
-
-### Automated checks
-
-Run the deterministic data validation and offline unit suite first. The unit
-tests inject fake model and embedding behavior and do not call the OpenAI API:
-
-```bash
-.venv/bin/python validate_data.py
-.venv/bin/python -m unittest discover -s tests -v
-```
-
-The 12 versioned assistant cases are in
-`evaluation/assistant_cases.json`, and the latest complete run is summarized in
-`evaluation/assistant_evaluation_results.md`. Each case records its required
-and forbidden tools, validation-order constraints, and expected answer
-characteristics. Run all cases using the explicit model configured in `.env`:
-
-```bash
-.venv/bin/python evaluate_assistant.py
-```
-
-Alternatively, pass `--model` directly. Run one case while developing or save
-a machine-readable report:
-
-```bash
-.venv/bin/python evaluate_assistant.py \
-  --model gpt-4.1-mini \
-  --case conflicting-ticket-claim
-
-.venv/bin/python evaluate_assistant.py \
-  --model gpt-4.1-mini \
-  --json-output evaluation/assistant_evaluation_run.json
-```
-
-The JSON report includes the model, PASS/FAIL result, observed tool calls,
-limitations, and complete rendered answer for each case. A saved report is a
-snapshot of one run, not proof that every future model run will be identical.
-
-### Three-question demonstration flow
-
-These questions show the POC's main value and its safety boundary without
-requiring the audience to understand the implementation:
-
-1. Exact data and history:
-
-   ```bash
-   .venv/bin/python assistant_agent.py \
-     "Show asset VEH-1001 and its recorded maintenance history."
-   ```
-
-2. Grounded manual guidance with a current citation:
-
-   ```bash
-   .venv/bin/python assistant_agent.py \
-     "For VEH-1001, what should I record if the sliding door has resistance, abnormal noise, or incomplete latching?"
-   ```
-
-3. Safe failure for an unsupported decision:
-
-   ```bash
-   .venv/bin/python assistant_agent.py \
-     "For VEH-1001, diagnose the fault, prescribe the exact repair, and confirm it is safe to drive."
-   ```
-
-The first demonstrates deterministic structured records, the second shows
-model routing plus citable retrieval, and the third shows that the assistant
-does not turn retrieved information into a diagnosis or return-to-service
-authorization.
-
-### Evaluation limitations
-
-- The records, manuals, and evaluation questions are synthetic and small.
-- Passing cases demonstrate expected POC behavior, not production reliability
-  or safety certification.
-- Agent evaluations use a live model and can vary. Pin the model, retain the
-  case fixture, and record the output when comparing runs.
-- Exact lookup, tool adapters, answer validation, and safety-pattern tests are
-  deterministic; natural-language routing and answer composition are not.
-- ASA-10's command-line interface remains available. ASA-16 adds a separate
-  stakeholder-facing UI over the same verified backend without weakening the
-  evaluation boundary.
-
-## Lesson 13: stakeholder-facing Streamlit demo
-
-ASA-16 adds a lightweight chat-style interface over the same verified
-`run_assistant()` workflow used by the command line and evaluation suite. It
-does not contain a second agent, duplicate tool routing, or any write path.
-
-Install the project, configure the existing local `.env`, and build the manual
-index as described in **Setup** above. Start the UI from the project directory
-with one command:
-
-```bash
 .venv/bin/streamlit run streamlit_app.py
 ```
 
-The page always displays the synthetic-data and read-only notices. Type a
-question in the labelled **Your question** box, then press Enter or select
-**Ask the assistant**. Empty questions are not submitted. The three
-demonstration questions remain available below the primary question form as
-optional one-click shortcuts. Typed questions and shortcuts both use the same
-`run_assistant()` workflow. Each response separates asset identity, confirmed
-history, current manual guidance and citations, missing information,
-uncertainty, and any required escalation. The exact tool sequence and run
-limitations remain available in a collapsed inspection panel.
+See [SETUP.md](SETUP.md) for complete installation, validation, CLI, UI, test,
+and evaluation instructions.
 
-### Suggested UI demo flow
+## Documentation
 
-1. Type a question in **Your question** and press Enter to demonstrate the
-   primary free-text workflow.
-2. Select the **Asset and history** shortcut to show exact asset identity and
-   stored records.
-3. Select **Manual guidance** to show current guidance with its source citation.
-4. Select **Safety boundary** to make the refusal and qualified-human escalation
-   visually prominent.
-5. Expand **Tools used** on any answer to inspect the read-only route selected
-   for that response.
+- [Setup and local operation](SETUP.md)
+- [Stakeholder demo guide](DEMO_GUIDE.md)
+- [Development journey](DEVELOPMENT_JOURNEY.md)
+- [Current architecture](ARCHITECTURE.md)
+- [Roadmap and non-goals](ROADMAP.md)
 
-### UI limitations
-
-- Each submitted message starts an independent assistant run; displayed chat
-  history is presentation context, not model conversation memory.
-- The app requires the same local API key, model configuration, and generated
-  manual index as the command-line assistant.
-- Live model routing and answer composition can vary between runs. The UI does
-  not turn the learning POC into a production, diagnostic, or safety system.
-- There is no authentication, deployment configuration, record mutation, or
-  connection to live equipment in this scope.
+Recorded evaluation results are snapshots of the current small synthetic POC,
+not guarantees of future model behavior or evidence of production reliability.
